@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: Сергей
+Build-Jdk: 1.8.0_241
+Implementation-Title: task-13 Maven Webapp
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: com.epam.winter-java-lab
+Main-Class: ${start-class}
+

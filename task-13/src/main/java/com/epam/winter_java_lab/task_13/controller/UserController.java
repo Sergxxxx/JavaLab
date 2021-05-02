@@ -3,43 +3,58 @@ package com.epam.winter_java_lab.task_13.controller;
 import com.epam.winter_java_lab.task_13.domain.Role;
 import com.epam.winter_java_lab.task_13.domain.User;
 import com.epam.winter_java_lab.task_13.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/user")
+@Api(value = "user resources")
 public class UserController {
-    @Autowired
+
     private UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    public String userList(Model model){
-        model.addAttribute("users", userService.findAll());
-        return "userList";
+    @ApiOperation(value = "show all users", response = List.class)
+    public List<User> userList(){
+        List<User> userList = userService.findAll();
+
+        return userList;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("{user}")
-    public String userEditForm(@PathVariable User user, Model model){
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Role.values());
-        return "userEdit";
+    @ApiOperation(value = "edit user role", response = ResponseEntity.class)
+    public ResponseEntity userEditForm(@PathVariable User user){
+        Role.values();
+
+        return new ResponseEntity("user " + user.getUsername(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public String userSave(
+    @ApiOperation(value = "save user", response = ResponseEntity.class)
+    public ResponseEntity userSave(
             @RequestParam String username,
             @RequestParam Map<String, String> form,
             @RequestParam("userId") User user
     ){
         userService.saveUser(user, username, form);
-        return "redirect:/user";
+
+        return new ResponseEntity("User saved successfully", HttpStatus.OK);
     }
+
 }

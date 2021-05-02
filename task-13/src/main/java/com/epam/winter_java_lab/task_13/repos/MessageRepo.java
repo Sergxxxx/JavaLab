@@ -9,10 +9,6 @@ import java.util.List;
 public interface MessageRepo extends CrudRepository<Message, Long> {
     List<Message> findByTag(String tag);
 
-    List<Message> findByOrderByCreatedDateTimeAsc();
-
-    List<Message> findByOrderByCreatedDateTimeDesc();
-
     @Query(value = "select * from (select *, row_number() over(partition " +
             "by user_id order by created_date_time desc) " +
             "as rn from message)t " +

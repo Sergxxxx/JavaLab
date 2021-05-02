@@ -2,46 +2,58 @@ package com.epam.winter_java_lab.task_13.controller;
 
 import com.epam.winter_java_lab.task_13.domain.User;
 import com.epam.winter_java_lab.task_13.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Map;
 
-@Controller
+@RestController
+@Api(value = "registration")
 public class RegistrationController {
-    @Autowired
+
     private UserService userService;
 
+    @Autowired
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/registration")
-    public String registration(){
-        return "registration";
+    @ApiOperation(value = "registration", response = ResponseEntity.class)
+        public ResponseEntity registration(){
+
+        return new ResponseEntity("registration", HttpStatus.OK);
     }
 
     @PostMapping("/registration")
-    public String addUser(@Valid User user, BindingResult bindingResult, Model model){
+    @ApiOperation(value = "registration new user", response = ResponseEntity.class)
+    public ResponseEntity addUser(@Valid User user, BindingResult bindingResult, Model model){
         if(user.getPassword() != null && !user.getPassword().equals(user.getPasswordConf())){
-            model.addAttribute("passwordError", "Password mismatch");
-            return "registration";
+
+            return new ResponseEntity("Password mismatch", HttpStatus.BAD_REQUEST);
         }
 
         if(bindingResult.hasErrors()){
-            Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
-            model.mergeAttributes(errors);
-            return "registration";
+
+            return new ResponseEntity("User has not been added", HttpStatus.BAD_REQUEST);
         }
 
         if(!userService.addUser(user)){
-            model.addAttribute("usernameError", "User already exists");
-            return "registration";
+
+            return new ResponseEntity("User already exists", HttpStatus.BAD_REQUEST);
         }
 
-        return "redirect:/login";
+        return new ResponseEntity("User added successfully", HttpStatus.OK);
     }
+
 }
 
 

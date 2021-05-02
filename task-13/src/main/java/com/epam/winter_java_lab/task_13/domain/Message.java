@@ -1,5 +1,8 @@
 package com.epam.winter_java_lab.task_13.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,35 +14,45 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Entity
+@Table(name = "message")
+@NoArgsConstructor
 public class Message {
+    @Getter
+    @Setter
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Please write a note")
     @Length(max = 1000, message = "Note too long")
+    @Column(name = "text", nullable = false)
     private String text;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Please write a tag")
     @Length(max = 30, message = "Tag too long")
+    @Column(name = "tag", nullable = false)
     private String tag;
 
+    @Getter
     @CreatedDate
-    @Column (nullable = false, updatable = false)
+    @Column (name = "created_date_time", nullable = false, updatable = false)
     private LocalDateTime createdDateTime;
 
+    @Getter
     @LastModifiedDate
-    @Column (nullable = false)
+    @Column (name = "updated_date_time", nullable = false)
     private LocalDateTime updatedDateTime;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
-
-    private String filename;
-
-    public Message() {
-    }
 
     public Message(String text, String tag, User user) {
         this.text = text;
@@ -51,56 +64,8 @@ public class Message {
         return author != null ? author.getUsername() : "<none>";
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public LocalDateTime getUpdatedDateTime() {
-        return updatedDateTime;
-    }
-
     public void setUpdatedDateTime(Long updatedDateTime) {
         this.updatedDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(updatedDateTime), ZoneId.systemDefault());
-    }
-
-    public LocalDateTime getCreatedDateTime() {
-        return createdDateTime;
     }
 
     public void setCreatedDateTime(Long createdDateTime) {

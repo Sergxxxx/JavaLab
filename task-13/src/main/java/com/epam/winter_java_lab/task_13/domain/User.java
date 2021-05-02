@@ -1,5 +1,8 @@
 package com.epam.winter_java_lab.task_13.domain;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,43 +16,65 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "usr")
+@EqualsAndHashCode(of = {"id"})
 public class User implements UserDetails {
+    @Getter
+    @Setter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Username cannot be empty")
     @Length(max = 15, message = "Username too long")
     @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Only english letters, numbers or underscore")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
+    @Getter
+    @Setter
     @Length(max = 15, message = "Password too long")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Only english letters or numbers")
+    @Column(name = "password", nullable = false)
     private String password;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Password confirmation cannot be empty")
     @Transient
     private String passwordConf;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email isn't correct")
+    @Column(name = "email", nullable = false)
     private String email;
 
+    @Getter
     @CreatedDate
+    @Column(name = "registration_date_time", nullable = false)
     private LocalDateTime registrationDateTime;
 
+    @Setter
+    @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Getter
+    @Setter
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Message> messages;
 
@@ -57,16 +82,12 @@ public class User implements UserDetails {
         return roles.contains(Role.ADMIN);
     }
 
-    public Long getId() {
-        return id;
+    public void setRegistrationDateTime(Long registrationDateTime) {
+        this.registrationDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(registrationDateTime), ZoneId.systemDefault());
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
+    public boolean isActive() {
+        return active;
     }
 
     @Override
@@ -89,83 +110,11 @@ public class User implements UserDetails {
         return isActive();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public Set<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(Set<Message> messages) {
-        this.messages = messages;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordConf() {
-        return passwordConf;
-    }
-
-    public void setPasswordConf(String passwordConf) {
-        this.passwordConf = passwordConf;
-    }
-
-    public LocalDateTime getRegistrationDateTime() {
-        return registrationDateTime;
-    }
-
-    public void setRegistrationDateTime(Long registrationDateTime) {
-        this.registrationDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(registrationDateTime), ZoneId.systemDefault());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
 
 
